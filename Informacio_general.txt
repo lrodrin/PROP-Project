@@ -1,0 +1,42 @@
+Base dades:
+
+- Excel per titulacions
+	- Una línia per cada grup de classe = 2 hores de classe del grup especificat
+- Excel per aules
+
+Programacio:
+
+- Proposar algoritme
+- Decidir com mostrar/recollir dades
+- Decidir estructura del codi
+
+- Estructura Dades -
+
+classe horari que serà una matriu de 6x5(filesxcolumnes)
+cada posisció de la matriu representa una classe espai_horari.
+	la classe espai_horai està representada per les variables dia(string),hora(string),array(classe asignatura)
+			*crear la classe pair nosaltres!!!!
+		la classe assignatura està representada per nom(string),grau(string),aula(pair(.first=nom i .second=tipus strings les dues i el tipus pot ser T o P),grup(string),
+
+classe horari
+
+per cada dia generar arbre classe_horari
+creiem amb fh i podes
+
+classe espai_horari
+
+generar arbre
+creiem amb fh i podes
+
+notes 
+hores són de 8:30-14:30 per files
+dies de dilluns a divendres per columnes
+
+classe pair
+
+classe assignatura	
+
+Grups de graus:
+- Establir màxim d'alumnes per titulació
+- Establir capacitats de classes, laboratoris...
+- Establir laboratoris per cada titulació
