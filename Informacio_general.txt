@@ -14,7 +14,7 @@ Programacio:
 
 classe horari que serà una matriu de 6x5(filesxcolumnes)
 cada posisció de la matriu representa una classe espai_horari.
-	la classe espai_horai està representada per les variables dia(string),hora(string),array(classe asignatura)
+	la classe espai_horai està representada per les variables dia(string),hora(string),array de string(classe asignatura)
 			*crear la classe pair nosaltres!!!!
 		la classe assignatura està representada per nom(string),grau(string),aula(pair(.first=nom i .second=tipus strings les dues i el tipus pot ser T o P),grup(string),
 
