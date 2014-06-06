@@ -11,9 +11,10 @@ public class Assignatura {
 	 /**
 	 * Constructora per defecte de la classe assignatura
 	 */
-	public Assignatura (String nom, String grau, Pair<String, String> aula, String grup) {
+	public Assignatura (String nom, String grau, String tipus, Pair<String, String> aula, String grup) {
 		Nom = nom;
 		Grau = grau;
+		Tipus = tipus;
 		Aula = aula;
 		Grup = grup;
 	}
@@ -30,6 +31,13 @@ public class Assignatura {
 	 */
 	public String Grau() {
 		return Grau;
+	}
+	
+	/**
+	 * Funció que retornarà el Tipus de l'assignatura
+	 */
+	public String Tipus() {
+		return Tipus;
 	}
 	
 	/**
@@ -50,7 +58,7 @@ public class Assignatura {
 	 * Funció que retornarà el l'assignatura en String
 	 */
 	public String Assignatura() {
-		String out = "Assignatura "+Nom+", del grau "+Grau+", de l'aula "+Aula.getFirst()+" i del grup "+Grup;
+		String out = "Assignatura "+Nom+", del grau "+Grau+", de "+Tipus+", a l'aula "+Aula.getFirst()+" i del grup "+Grup;
 		return out;
 	}
 }
