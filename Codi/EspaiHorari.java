@@ -1,10 +1,10 @@
 public class EspaiHorari {
     private String dia, hora;
-    private Assignatura[] assignatura;
+    private Assignatura[] assignatures;
   
     public EspaiHorari() {
-        this.assignatura = new Assignatura[5];
-        for(int i = 0; i < 5; i++) assignatura[i] = null;
+        this.assignatures = new Assignatura[5];
+        for(int i = 0; i < 5; i++) assignatures[i] = null;
     }
     
     public void setDia(String dia) {
@@ -15,8 +15,8 @@ public class EspaiHorari {
         this.hora = hora;
     }
     
-    public void setAssignatura(Assignatura[] assignatura) {
-        this.assignatura = assignatura;
+    public void setAssignatures(Assignatura[] assignatures) {
+        this.assignatures = assignatures;
     }
     
     public String getDia() {
@@ -29,5 +29,9 @@ public class EspaiHorari {
     
     public Assignatura getAssignatura(int i) {
         return assignatura[i];
+    }
+
+    public Assignatura getAssignatures() {
+        return assignatures;
     }
 }
