@@ -1,5 +1,13 @@
 package horari;
 
+import java.io.File;
+import java.io.IOException;
+
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.read.biff.BiffException;
+
 public class Horari {
 
 	private EspaiHorari[][] matriu;
@@ -28,8 +36,84 @@ public class Horari {
 	
 	/**
 	 * Funció que crearà l'horari
+	 * @throws IOException 
+	 * @throws BiffException 
 	 */
-	public void creaHorari(){
+	public void creaHorari() throws BiffException, IOException
+	{
+		// llegir excels de cada Grau (de moment Q1)
+		Workbook informatica = Workbook.getWorkbook(new File("/home/rafael/Projecte-PROP/BaseDades/Informatica.xls"));
+		Workbook electronica = Workbook.getWorkbook(new File("/home/rafael/Projecte-PROP/BaseDades/Electronica.xls"));
+		Workbook mecanica = Workbook.getWorkbook(new File("/home/rafael/Projecte-PROP/BaseDades/Mecanica.xls"));
+		Workbook electrica = Workbook.getWorkbook(new File("/home/rafael/Projecte-PROP/BaseDades/Electrica.xls"));
+		Workbook disseny = Workbook.getWorkbook(new File("/home/rafael/Projecte-PROP/BaseDades/Disseny.xls"));
+		
+		// obtenir les aules dels excel
+		Workbook aules = Workbook.getWorkbook(new File("/home/rafael/Projecte-PROP/BaseDades/Aules.xls"));
+		
+		// obtenir les assignatures de cada grau
+		
+		int filaAssignatura = 1;
+			
+		for (int fila = 0; fila < 6; ++fila){
+			for (int col = 0; col < 5; ++col){
+
+				// obtenir l'espai horari
+
+				// afegir assignatura a l'espai horari en la posicio "grau"
+
+				for (int grau = 0; grau < 5; ++grau){
+					Workbook aux;
+
+					switch(grau){
+					case 0:
+						aux = informatica;
+						break;
+					case 1:
+						aux = electronica;
+						break;
+					case 2:
+						aux = mecanica;
+						break;
+					case 3:
+						aux = electrica;
+						break;
+					case 4:
+						aux = disseny;
+						break;
+					default:
+						aux = informatica;
+						break;
+					}
+
+					// obtenir fulla "Q1" de l'excel
+					Sheet fullaQ1 = aux.getSheet("Q1");
+
+					if (filaAssignatura < fullaQ1.getRows()){
+						Cell casella = fullaQ1.getCell(0, filaAssignatura);
+						
+						System.out.println("Grau "+grau + "--"+casella.getContents());
+					}
+				}
+				
+				++filaAssignatura;
+
+			}
+		}
+		
+		
+		// per cada espai de la matriu, afegir assignatura de cada grau a cada posicio de l'array
+		// OJO: si el grup es massa gran, es divideix en dos dies diferents, no en diferents aules el mateix dia
+		
+		//Posicio de les assignatures a l'array
+		//	0: informatica
+		//	1: electronica
+		//	2: mecanica
+		//	3: electrica
+		//	4: disseny
+		
+		
+		
 		
 	}
 	
@@ -118,3 +202,4 @@ public class Horari {
 		}
 	}
 }
+
