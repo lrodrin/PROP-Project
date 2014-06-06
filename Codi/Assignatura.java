@@ -5,13 +5,13 @@ public class Assignatura {
 	private String Nom;
 	private String Grau;
 	private String Tipus;
-	private Pair(Nom,Tipus) Aula;
+	private Pair<String, String> Aula;
 	private String Grup;
 		
 	 /**
 	 * Constructora per defecte de la classe assignatura
 	 */
-	public Assignatura (String nom, String grau, Pair(nom,tipus) aula, String grup) {
+	public Assignatura (String nom, String grau, Pair<String, String> aula, String grup) {
 		Nom = nom;
 		Grau = grau;
 		Aula = aula;
@@ -50,6 +50,7 @@ public class Assignatura {
 	 * Funció que retornarà el l'assignatura en String
 	 */
 	public String Assignatura() {
-		syste.out.printf("Assignatura %s, del grau %s, de l'aula %s i del grup %s", Nom, Grau, Aula.nom, Grup);
+		String out = "Assignatura "+Nom+", del grau "+Grau+", de l'aula "+Aula.getFirst()+" i del grup "+Grup;
+		return out;
 	}
 }
