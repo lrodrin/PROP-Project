@@ -28,10 +28,11 @@ public class EspaiHorari {
     }
     
     public Assignatura getAssignatura(int i) {
-        return assignatura[i];
+        return assignatures[i];
     }
 
-    public Assignatura getAssignatures() {
+    public Assignatura[] getAssignatures() {
         return assignatures;
     }
 }
+

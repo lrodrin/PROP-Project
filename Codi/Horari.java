@@ -17,21 +17,23 @@ public class Horari {
 	 */
 	public Horari()
 	{
-		
 		matriu = new EspaiHorari[6][5];
 		
 		for (int fila = 0; fila < 6; ++fila){
 			for (int col = 0; col < 5; ++col){
 				
+				// crear i introduir els espais horaris a cada posicio de la matriu
+				
 				String dia = columnaDia(col);
 				String hora = filaHora(fila);
 				
-				// omplir espais horaris
+				EspaiHorari espai = new EspaiHorari();
+				espai.setDia(dia);
+				espai.setHora(hora);
 				
-				matriu[fila][col] = null;
+				matriu[fila][col] = espai;
 			}
 		}
-		
 	}
 	
 	/**
@@ -50,6 +52,7 @@ public class Horari {
 		
 		// obtenir les aules dels excel
 		Workbook aules = Workbook.getWorkbook(new File("/home/rafael/Projecte-PROP/BaseDades/Aules.xls"));
+		Sheet fullaAules = aules.getSheet("Hoja1");
 		
 		// obtenir les assignatures de cada grau
 		
@@ -59,30 +62,38 @@ public class Horari {
 			for (int col = 0; col < 5; ++col){
 
 				// obtenir l'espai horari
-
+				EspaiHorari espai = matriu[fila][col];
+				
 				// afegir assignatura a l'espai horari en la posicio "grau"
-
 				for (int grau = 0; grau < 5; ++grau){
 					Workbook aux;
 
+					String nomGrau;
+					
 					switch(grau){
 					case 0:
 						aux = informatica;
+						nomGrau = "INFORMATICA";
 						break;
 					case 1:
 						aux = electronica;
+						nomGrau = "ELECTRONICA";
 						break;
 					case 2:
 						aux = mecanica;
+						nomGrau = "MECANICA";
 						break;
 					case 3:
 						aux = electrica;
+						nomGrau = "ELECTRICA";
 						break;
 					case 4:
 						aux = disseny;
+						nomGrau = "DISSENY";
 						break;
 					default:
 						aux = informatica;
+						nomGrau = "INFORMATICA";
 						break;
 					}
 
@@ -90,11 +101,23 @@ public class Horari {
 					Sheet fullaQ1 = aux.getSheet("Q1");
 
 					if (filaAssignatura < fullaQ1.getRows()){
-						Cell casella = fullaQ1.getCell(0, filaAssignatura);
 						
-						System.out.println("Grau "+grau + "--"+casella.getContents());
+						String nomAssignatura = fullaQ1.getCell(0, filaAssignatura).getContents();
+						//String alumnes = fullaQ1.getCell(1, filaAssignatura).getContents();
+						String grupsAlumnes = fullaQ1.getCell(2, filaAssignatura).getContents();
+						String tipus = fullaQ1.getCell(3, filaAssignatura).getContents();
+						
+						Pair<String, String> aula = obtenirAula(fullaAules, tipus);
+						
+						Assignatura assignatura = new Assignatura(nomAssignatura, nomGrau, tipus, aula, grupsAlumnes);
+						
+						Assignatura[] assignatures = espai.getAssignatures();
+						assignatures[grau] = assignatura;
+						espai.setAssignatures(assignatures);
 					}
 				}
+				
+				matriu[fila][col] = espai;
 				
 				++filaAssignatura;
 
@@ -115,6 +138,31 @@ public class Horari {
 		
 		
 		
+	}
+	
+	private Pair<String, String> obtenirAula(Sheet fulla, String tipus)
+	{
+		
+		boolean found = false;
+		
+		String nomAula = "";
+		String tipusAula = "";
+		
+		for (int i = 1; i < fulla.getRows() && !found; ++i){
+			nomAula = fulla.getCell(0, i).getContents();
+			tipusAula = fulla.getCell(2, i).getContents();
+			
+			if (tipusAula.equalsIgnoreCase(tipus)){
+				found = true;
+			}
+		}
+		
+		Pair<String, String> out = null;
+		if (found){
+			out = new Pair<String, String>(nomAula, tipusAula);
+		}
+		
+		return out;
 	}
 	
 	/**
@@ -194,11 +242,39 @@ public class Horari {
 	public void mostraHorari()
 	{
 		for (int fila = 0; fila < 6; ++fila){
+			
+			String vora = "";
+			String info = "";
+			String assignatura = "";
+			String grup = "";
+			String grau = "";
+			String tipus = "";
+			String aula = "";
+			
 			for (int col = 0; col < 5; ++col){
 				
-				// mostra la info de l'espai horari que hi hagi
+				EspaiHorari espai = matriu[fila][col];
+				vora += "------------------------";
 				
+				if (espai.getAssignatura(0) != null){
+					// mostra la info de l'espai horari que hi hagi
+					info += "| "+espai.getDia() +"  " + espai.getHora() +" |";
+					assignatura += "| Assignatura: "+espai.getAssignatura(0).Nom()+"   |";
+					grup += "| Grup: "+espai.getAssignatura(0).Grup() +"           |";
+					grau += "| Grau: "+espai.getAssignatura(0).Grau() +"   |";
+					tipus += "| Tipus: "+espai.getAssignatura(0).Tipus() +"            |";
+					aula += "| Aula: "+espai.getAssignatura(0).Aula().getFirst() +"         |";
+				}
 			}
+			
+			System.out.println(vora);
+			System.out.println(info);
+			System.out.println(assignatura);
+			System.out.println(grup);
+			System.out.println(grau);
+			System.out.println(tipus);
+			System.out.println(aula);
+			System.out.println(vora);
 		}
 	}
 }
