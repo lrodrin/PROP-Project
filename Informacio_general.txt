@@ -40,3 +40,20 @@ Grups de graus:
 - Establir màxim d'alumnes per titulació
 - Establir capacitats de classes, laboratoris...
 - Establir laboratoris per cada titulació
+
+
+Modificacions (17/06/2014)
+- Afegides estriccions d'aules
+	- Una aula no es pot repetir en el mateix espai horari
+
+- Afegides restriccions d'assignatures
+	- En les de teoria, pot haver més d'un grup diferent de la mateixa assignatura a la mateixa aula, si el numero d'alumnes no supera la capacitat de l'aula
+	- En les de practica, pot haver més d'un grup diferent de la mateixa assignatura en diferentes aules
+	- PENDENT!! -> En les de teoria, pot haver més d'un grup diferent de la mateixa assignatura en diferents aules
+	- PENDENT!! -> Dues assignatures diferents de diferents grups (mateix grau) poden estar en aules diferents en el mateix espai horari
+
+- Mapejar l'excel a objecte
+
+- Coses a tenir en compte:
+	- Per al Q3 de les industrials, les assignatures són per la tarda
+	- Dijous de 12.30 a 14.30 es reserva l'espai sense classe per a possibles recuperacions d'hores
