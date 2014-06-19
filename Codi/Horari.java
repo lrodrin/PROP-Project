@@ -2,6 +2,7 @@ package horari;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -97,6 +98,12 @@ public class Horari {
 		Workbook aules = Workbook.getWorkbook(new File("/home/rafael/Projecte-PROP/BaseDades/Aules.xls"));
 		Sheet fullaAules = aules.getSheet("Hoja1");
 		
+		Set<String> grupsInformatica = obtenirGrups(informatica);
+		Set<String> grupsElectronica = obtenirGrups(electronica);
+		Set<String> grupsMecanica = obtenirGrups(mecanica);
+		Set<String> grupsElectrica = obtenirGrups(electrica);
+		Set<String> grupsDisseny = obtenirGrups(disseny);
+		
 		for (int fila = 0; fila < 6; ++fila){
 			for (int col = 0; col < 5; ++col){
 
@@ -108,38 +115,152 @@ public class Horari {
 				// afegir assignatura a l'espai horari en la posicio "grau"
 				for (int grau = 0; grau < 5; ++grau){
 					Set<ObjecteExcel> aux;
-
+					Set<String> auxGrups;
 					String nomGrau;
 					
 					switch(grau){
 					case 0:
 						aux = informatica;
+						auxGrups = grupsInformatica;
 						nomGrau = "INFORMATICA";
 						break;
 					case 1:
 						aux = electronica;
+						auxGrups = grupsElectronica;
 						nomGrau = "ELECTRONICA";
 						break;
 					case 2:
 						aux = mecanica;
+						auxGrups = grupsMecanica;
 						nomGrau = "MECANICA";
 						break;
 					case 3:
 						aux = electrica;
+						auxGrups = grupsElectrica;
 						nomGrau = "ELECTRICA";
 						break;
 					case 4:
 						aux = disseny;
+						auxGrups = grupsDisseny;
 						nomGrau = "DISSENY";
 						break;
 					default:
 						aux = informatica;
+						auxGrups = grupsInformatica;
 						nomGrau = "INFORMATICA";
 						break;
 					}
-
+					
+					for (String codiGrup : auxGrups){
+						
+						// escollir assignatura i introduir-la si es pot
+						boolean introduida = false;
+						Iterator<ObjecteExcel> it = aux.iterator();
+						while (it.hasNext() && !introduida){
+							ObjecteExcel objExcel = it.next();
+							
+							String nomAssignatura = objExcel.getNomAssignatura();
+							String grupAlumnes = objExcel.getGrups();
+							String tipus = objExcel.getTipus();
+							
+							Pair<String, String> aula = obtenirAula(fullaAules, tipus, aulesOcupades);
+							if (aula != null){
+								aulesOcupades.add(aula.getFirst());
+								
+								int repes = 0;
+								ArrayList<ArrayList<Assignatura>> assignatures = espai.getAssignatures();
+								for (int i = 0; i < grau; ++i){
+									ArrayList<Assignatura> assignaturesGrau = assignatures.get(i);
+									
+									for (Assignatura assig : assignaturesGrau){
+										if (assig.Nom().equalsIgnoreCase(nomAssignatura)){
+											++repes;
+										}
+									}
+								}
+								
+								// si la assignatura no es repeteix més de dos cops, introduirla i 
+								// treurela del set d'assignatures pendents per afegir a l'horari
+								if (repes <= 2 && (grupAlumnes.equalsIgnoreCase(codiGrup) || grupAlumnes.startsWith(codiGrup))){
+									
+									aux.remove(objExcel);
+									
+									// si el tipus d'assignatura és "teoria", afegir l'assignatura
+									if (tipus.equalsIgnoreCase("T")){
+										
+										Iterator<ObjecteExcel> it2 = aux.iterator();
+										boolean trobat = false;
+										while (it2.hasNext() && !trobat){
+											ObjecteExcel obj = it2.next();
+											
+											if (!obj.getGrups().startsWith(codiGrup) && !obj.getGrups().equalsIgnoreCase(codiGrup)){
+												if (obj.getNomAssignatura().equalsIgnoreCase(nomAssignatura) && obj.getTipus().equalsIgnoreCase(tipus)){
+													Pair<String, String> novaAula = obtenirAula(fullaAules, tipus, aulesOcupades);
+													
+													if (novaAula != null){
+														grupAlumnes += "/"+ obj.getGrups();
+														String auxiliar = aula.getFirst();
+														auxiliar += "/"+novaAula.getFirst();
+														aula.setFirst(auxiliar);
+														
+														aux.remove(obj);
+														trobat = true;
+													}
+												}
+											}
+										}
+										
+										Assignatura assignatura = new Assignatura(nomAssignatura, nomGrau, tipus, aula, grupAlumnes);
+										
+										//assignatures[grau] = assignatura;
+										ArrayList<Assignatura> assignaturesGrau = assignatures.get(grau);
+										assignaturesGrau.add(assignatura);
+										assignatures.set(grau, assignaturesGrau);
+										espai.setAssignatures(assignatures);
+										
+										introduida = true;
+										
+									} else {  // si el tipus és "practica", fer dos grups en dues aules diferents
+										
+										Iterator<ObjecteExcel> it2 = aux.iterator();
+										boolean trobat = false;
+										while (it2.hasNext() && !trobat){
+											ObjecteExcel obj = it2.next();
+											
+											if (obj.getGrups().startsWith(codiGrup) || obj.getGrups().equalsIgnoreCase(codiGrup)){
+												if (obj.getNomAssignatura().equalsIgnoreCase(nomAssignatura) && obj.getTipus().equalsIgnoreCase(tipus)){
+													Pair<String, String> novaAula = obtenirAula(fullaAules, tipus, aulesOcupades);
+													if (novaAula != null){
+														grupAlumnes += "/"+ obj.getGrups();
+														
+														String auxiliar = aula.getFirst();
+														auxiliar += "/"+novaAula.getFirst();
+														aula.setFirst(auxiliar);
+														
+														aux.remove(obj);
+														trobat = true;
+													}
+												}
+											}
+										}
+										
+										Assignatura assignatura = new Assignatura(nomAssignatura, nomGrau, tipus, aula, grupAlumnes);
+										
+										//assignatures[grau] = assignatura;
+										ArrayList<Assignatura> assignaturesGrau = assignatures.get(grau);
+										assignaturesGrau.add(assignatura);
+										assignatures.set(grau, assignaturesGrau);
+										espai.setAssignatures(assignatures);
+										
+										introduida = true;
+									}
+								}
+							}
+						}
+					}
+					
 					// escollir assignatura i introduir-la si es pot
-					boolean introduida = false;
+					/*boolean introduida = false;
 					Iterator<ObjecteExcel> it = aux.iterator();
 					while (it.hasNext() && !introduida){
 						ObjecteExcel objExcel = it.next();
@@ -152,10 +273,11 @@ public class Horari {
 						aulesOcupades.add(aula.getFirst());
 						
 						int repes = 0;
-						Assignatura[] assignatures = espai.getAssignatures();
+						ArrayList<ArrayList<Assignatura>> assignatures = espai.getAssignatures();
 						for (int i = 0; i < grau; ++i){
-							Assignatura assig = assignatures[i];
-							if (assig != null){
+							ArrayList<Assignatura> assignaturesGrau = assignatures.get(i);
+							
+							for (Assignatura assig : assignaturesGrau){
 								if (assig.Nom().equalsIgnoreCase(nomAssignatura)){
 									++repes;
 								}
@@ -204,12 +326,15 @@ public class Horari {
 							
 							Assignatura assignatura = new Assignatura(nomAssignatura, nomGrau, tipus, aula, grupAlumnes);
 							
-							assignatures[grau] = assignatura;
+							//assignatures[grau] = assignatura;
+							ArrayList<Assignatura> assignaturesGrau = assignatures.get(grau);
+							assignaturesGrau.add(assignatura);
+							assignatures.set(grau, assignaturesGrau);
 							espai.setAssignatures(assignatures);
 							
 							introduida = true;
 						}
-					}
+					}*/
 				}
 				
 				matriu[fila][col] = espai;
@@ -233,6 +358,23 @@ public class Horari {
 		
 	}
 	
+	private Set<String> obtenirGrups(Set<ObjecteExcel> set)
+	{
+		Set<String> out = new HashSet<String>();
+		
+		for (ObjecteExcel obj : set){
+			String grup = obj.getGrups();
+			
+			if (grup.length() == 3){
+				out.add(grup);
+			} else {
+				out.add(grup.substring(0,3));
+			}
+		}
+		
+		return out;
+	}
+	
 	/**
 	 * Mètode per a mapejar la informació de l'excel a un conjunt de ObjecteExcel
 	 * 
@@ -254,8 +396,17 @@ public class Horari {
 			String tipus = fulla.getCell(3, i).getContents();
 			
 			for (int j = 0 ; j < grups.length; ++j){
-				ObjecteExcel objecte = new ObjecteExcel(nom, 15, grups[j], tipus);
-				out.add(objecte);
+				if (tipus.equalsIgnoreCase("P")){
+					ObjecteExcel objecte = new ObjecteExcel(nom, 15, grups[j]+"11", tipus);
+					out.add(objecte);
+					
+					objecte = new ObjecteExcel(nom, 15, grups[j]+"12", tipus);
+					out.add(objecte);
+					
+				} else {
+					ObjecteExcel objecte = new ObjecteExcel(nom, 30, grups[j], tipus);
+					out.add(objecte);
+				}
 			}
 		}
 		
@@ -285,6 +436,10 @@ public class Horari {
 			if (tipusAula.equalsIgnoreCase(tipus) && !aulesOcupades.contains(nomAula)){
 				found = true;
 			}
+		}
+		
+		if (!found){
+			System.out.print("");
 		}
 		
 		Pair<String, String> out = null;
@@ -388,32 +543,37 @@ public class Horari {
 				EspaiHorari espai = matriu[fila][col];
 				vora += "-----------------------------";
 				
-				if (espai.getAssignatura(grauN) != null){
-					// mostra la info de l'espai horari que hi hagi
-					
-					String aux = espai.getDia() +"  " + espai.getHora();
-					while (aux.length() < 25) aux += " ";
-					info += "| "+ aux +" |";
-					
-					aux = "Assignatura: "+espai.getAssignatura(grauN).Nom();
-					while (aux.length() < 25) aux += " ";
-					assignatura += "| "+ aux +" |";
-					
-					aux = "Grup: "+espai.getAssignatura(grauN).Grup();
-					while (aux.length() < 25) aux += " ";
-					grup += "| "+aux +" |";
-					
-					aux = "Grau: "+espai.getAssignatura(grauN).Grau();
-					while (aux.length() < 25) aux += " ";
-					grau += "| "+aux + " |";
-					
-					aux = "Tipus: "+espai.getAssignatura(grauN).Tipus();
-					while (aux.length() < 25) aux += " ";
-					tipus += "| "+aux+" |";
-					
-					aux = "Aula: "+espai.getAssignatura(grauN).Aula().getFirst();
-					while (aux.length() < 25) aux += " ";
-					aula += "| "+aux+" |";
+				ArrayList<ArrayList<Assignatura>> assignatures = espai.getAssignatures();
+				ArrayList<Assignatura> assignaturesGrau = assignatures.get(grauN);
+				
+				if (!assignaturesGrau.isEmpty()){
+					for (Assignatura assig : assignaturesGrau){
+						// mostra la info de l'espai horari que hi hagi
+						
+						String aux = espai.getDia() +"  " + espai.getHora();
+						while (aux.length() < 25) aux += " ";
+						info += "| "+ aux +" |";
+						
+						aux = "Assignatura: "+assig.Nom();
+						while (aux.length() < 25) aux += " ";
+						assignatura += "| "+ aux +" |";
+						
+						aux = "Grup: "+assig.Grup();
+						while (aux.length() < 25) aux += " ";
+						grup += "| "+aux +" |";
+						
+						aux = "Grau: "+assig.Grau();
+						while (aux.length() < 25) aux += " ";
+						grau += "| "+aux + " |";
+						
+						aux = "Tipus: "+assig.Tipus();
+						while (aux.length() < 25) aux += " ";
+						tipus += "| "+aux+" |";
+						
+						aux = "Aula: "+assig.Aula().getFirst();
+						while (aux.length() < 25) aux += " ";
+						aula += "| "+aux+" |";
+					}
 					
 				} else {
 					String aux = "";

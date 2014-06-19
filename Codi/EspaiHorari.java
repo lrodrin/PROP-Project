@@ -1,10 +1,17 @@
+package horari;
+
+import java.util.ArrayList;
+
 public class EspaiHorari {
     private String dia, hora;
-    private Assignatura[] assignatures;
+    private ArrayList<ArrayList<Assignatura>> assignatures;
   
     public EspaiHorari() {
-        this.assignatures = new Assignatura[5];
-        for(int i = 0; i < 5; i++) assignatures[i] = null;
+        this.assignatures = new ArrayList<ArrayList<Assignatura>>();
+        for(int i = 0; i < 5; i++){
+        	ArrayList<Assignatura> array = new ArrayList<Assignatura>();
+        	assignatures.add(array);
+        }
     }
     
     public void setDia(String dia) {
@@ -15,7 +22,7 @@ public class EspaiHorari {
         this.hora = hora;
     }
     
-    public void setAssignatures(Assignatura[] assignatures) {
+    public void setAssignatures(ArrayList<ArrayList<Assignatura>> assignatures) {
         this.assignatures = assignatures;
     }
     
@@ -27,11 +34,11 @@ public class EspaiHorari {
         return hora;
     }
     
-    public Assignatura getAssignatura(int i) {
-        return assignatures[i];
+    public ArrayList<Assignatura> getGrau(int i) {
+        return assignatures.get(i);
     }
 
-    public Assignatura[] getAssignatures() {
+    public ArrayList<ArrayList<Assignatura>> getAssignatures() {
         return assignatures;
     }
 }
